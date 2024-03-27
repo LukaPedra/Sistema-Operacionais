@@ -44,8 +44,7 @@ int main(int argc, char *argv[]) {
             int comeco = i * PARCELA; // Começo da parcela no vetor
             int final = (i + 1) * PARCELA; // Final da parcela no vetor
             for(int p = comeco; p < final; p++) {
-                a[p] *= 2;
-                soma += a[p];
+                soma += a[p] * 2;
             }
             Parcelas[i] = soma; // Salvar resultado da soma
 
