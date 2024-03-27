@@ -16,12 +16,12 @@
 #define PARCELA 1000
 
 int main(int argc, char *argv[]) {
-    int pid, status, segmento, somaTotal[NUM_TRABALHADORES];
+    int pid, status, segmento, *Parcelas,a[TAM_MAX];
 
     // Alocar memória compartilhada
     segmento = shmget (IPC_PRIVATE, 10*sizeof (int), IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR);
     // Associar a memória compartilhada ao processo
-    int a[TAM_MAX] = (int *) shmat(segmento, 0, 0);
+    Parcelas = (int *) shmat(segmento, 0, 0);
 
     // Inicializar vetor com 5
     for (int i = 0; i < TAM_MAX; i++) {
@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
                 a[p] *= 2;
                 soma += a[p];
             }
-            somaTotal[i] = soma; // Salvar resultado da soma
+            Parcelas[i] = soma; // Salvar resultado da soma
 
             exit(1);
         }
@@ -57,11 +57,11 @@ int main(int argc, char *argv[]) {
     int somaParcelas = 0;
     for(int i = 0; i < NUM_TRABALHADORES; i++) {
         waitpid(-1, &status, 0);
-        somaParcelas += somaTotal[i];
+        somaParcelas += Parcelas[i];
     }
 
     // Soma total das parcelas
-    printf("Soma das parcelas: %d", somaParcelas);
+    printf("Soma das parcelas: %d\n", somaParcelas);
 
     // libera a memória compartilhada do processo
     shmdt (a);
