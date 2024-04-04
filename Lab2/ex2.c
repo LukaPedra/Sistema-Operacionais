@@ -1,19 +1,15 @@
-// Vetor de 10.000 posições começando com 5
-// Criar 10 processos filhos
-// Cada processo vai multiplicar por 2 e somar as posições
-// Processo pai vai exibir o resultado
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/shm.h>
+#include <sys/stat.h>
 #include <sys/ipc.h>
 #include <semaphore.h>
 
 #define TAM_MAX 10000
 #define NUM_TRABALHADORES 2
-#define PARCELA 1000
 
 int main(int argc, char *argv[])
 {
