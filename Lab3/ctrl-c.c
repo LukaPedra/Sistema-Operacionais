@@ -24,7 +24,6 @@ int main(void)
 void intHandler(int sinal)
 {
 	printf("Você pressionou Ctrl-C (%d)\n", sinal);
-	kill(0, SIGKILL);
 }
 void killhandler(int sinal)
 {
