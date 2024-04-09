@@ -23,13 +23,13 @@ void escalonar(int estado) {
 	
 }
 
-int main() {
+int main(int argc, char *argv[]) {
     // Criar processo filho 1
     child1_pid = fork();
     if (child1_pid == 0) {
         // Código do processo filho 1
-        char *args[] = {"./loop", NULL};
-        execvp(args[0], args);
+		//I am trying to execute the command passed as argument
+		execvp(argv[1], argv);
 		kill(getpid(), SIGSTOP);
         return 0;
     }
@@ -38,8 +38,7 @@ int main() {
     child2_pid = fork();
     if (child2_pid == 0) {
         // Código do processo filho 2
-        char *args[] = {"./loop.out", NULL};
-        execvp(args[0], args);
+        execvp(argv[1], argv);
 		kill(getpid(), SIGSTOP);
         return 0;
     }
