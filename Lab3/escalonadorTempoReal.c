@@ -6,6 +6,9 @@
 #include <signal.h>
 #include <sys/time.h>
 
+#define TRUE 1
+#define FALSE 0
+
 int main() {
     struct timeval start_time; // Obter o tempo inicial
     struct timeval current_time; // Obter o tempo atual
@@ -13,6 +16,10 @@ int main() {
     long int sec_inicio;
     long int sec_atual;
     long int dif;
+
+	int p1_state = FALSE;
+	int p2_state = FALSE;
+	int p3_state = FALSE;
 
     // Definição dos tempos de início e duração de cada processo
     int p1_start = 5;
@@ -40,43 +47,64 @@ int main() {
             dif = sec_atual - sec_inicio;
 
             if((dif % 60) == p1_start) {
-                kill(p3, SIGSTOP);
-                kill(p1, SIGCONT);
-            } 
-            if((dif % 60) == (p1_duration + p1_start)) {
-                kill(p1, SIGSTOP);
-                kill(p3, SIGCONT);
-            }
-            if((dif % 60) == p2_start) {
-                kill(p3, SIGSTOP);
-                kill(p2, SIGCONT);
-            }
-            if((dif % 60) == 0) {
-                kill(p2, SIGSTOP);
-                kill(p3, SIGCONT);
-            }
+				printf("P1 rodando @ %ld\n", dif);
+				if (p3_state == TRUE) {
+					printf("P3 parado @ %ld\n", dif);
+					kill(p3, SIGSTOP);
+					p3_state = FALSE;
+				}
+				kill(p1, SIGCONT);
+				p1_state = TRUE;
+			} 
+			if((dif % 60) == (p1_duration + p1_start)) {
+				printf("P1 parado @ %ld\n", dif);
+				kill(p1, SIGSTOP);
+				p1_state = FALSE;
+			}
+			if((dif % 60) == p2_start) {
+				printf("P2 rodando @ %ld\n", dif);
+				if (p3_state == TRUE) {
+					printf("P3 parado @ %ld\n", dif);
+					kill(p3, SIGSTOP);
+					p3_state = FALSE;
+				}
+				kill(p2, SIGCONT);
+				p2_state = TRUE;
+			}
+			if((dif % 60) == 0) {
+				printf("P2 parado @ %ld\n", dif);
+				kill(p2, SIGSTOP);
+				p2_state = FALSE;
+			}
+			if(p1_state == FALSE && p2_state == FALSE && p3_state == FALSE){
+				printf("P3 rodando @ %ld\n", dif);
+				kill(p3, SIGCONT);
+				p3_state = TRUE;
+			}
+			usleep(500000); // 500ms
         }
     }
 
     // Processo filho 1
     if (p1 == 0) {
-        kill(getpid(), SIGSTOP);
-        printf("Iniciando processo 1.\n");
-        return 0;
+		while(1){
+			sleep(5);
+        }
     }
 
     // Processo filho 2
     if (p2 == 0) {
-        kill(getpid(), SIGSTOP);
-        printf("Iniciando processo 2.\n");
-        return 0;
+        while(1){
+
+			sleep(5);
+        }
     }
 
     // Processo filho 3
     if (p3 == 0) {
-        kill(getpid(), SIGSTOP);
-        printf("Iniciando processo 3.\n");
-        return 0;
+        while(1){
+			sleep(5);
+        }
     }
 
     return 0;
