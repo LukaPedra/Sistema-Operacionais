@@ -13,8 +13,8 @@ int main() {
     struct timeval start_time; // Obter o tempo inicial
     struct timeval current_time; // Obter o tempo atual
 
-    long int sec_inicio;
-    long int sec_atual;
+    long int start_sec;
+    long int current_sec;
     long int dif;
 
 	int p1_state = FALSE;
@@ -37,14 +37,14 @@ int main() {
     if (p1 > 0 && p2 > 0 && p3 > 0 ){
         // Obter o tempo inicial
         gettimeofday(&start_time, NULL);
-        sec_inicio = start_time.tv_sec;
+        start_sec = start_time.tv_sec;
 
         // Loop infinito
         while (1) {
             // Obter o tempo atual
             gettimeofday(&current_time, NULL);
-            sec_atual = current_time.tv_sec;
-            dif = sec_atual - sec_inicio;
+            current_sec = current_time.tv_sec;
+            dif = current_sec - start_sec;
 
             if((dif % 60) == p1_start) {
 				printf("P1 rodando @ %ld\n", dif);
@@ -95,7 +95,6 @@ int main() {
     // Processo filho 2
     if (p2 == 0) {
         while(1){
-
 			sleep(5);
         }
     }
