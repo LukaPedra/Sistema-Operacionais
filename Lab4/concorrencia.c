@@ -2,8 +2,10 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#define TAM_MAX 10000
-#define NUM_THREADS 2
+#define TAM_MAX 100000
+#define NUM_THREADS 100
+#define FALSE 1
+#define TRUE 0
 
 int vetor[TAM_MAX];
 
@@ -34,11 +36,21 @@ int main(int argc, char *argv[]) {
     }
 
     // Verificar valores do vetor
-    for (int i = 0; i < TAM_MAX; i++) {
-        if (vetor[i] != 26) {
-            printf("%d\n", vetor[i]);
+    int verificador = -1;
+    for (int i = 0; i < TAM_MAX - 1; i++) {
+        if (vetor[i] != vetor[i + 1]) {
+            verificador = FALSE;
+        } else {
+            verificador = TRUE;
         }
     }
+
+    // Exibir resultado
+    if (verificador == FALSE) {
+            printf("Elementos do vetor possuem valores distintos.\n");
+        } else {
+            printf("Elementos do vetor possuem o mesmo valor.\n");
+        }
 
     return 0;
 }

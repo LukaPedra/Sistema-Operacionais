@@ -3,8 +3,8 @@
 #include <unistd.h>
 #include <pthread.h>
 
-#define TAM_MAX 10000
-#define NUM_THREADS 10
+#define TAM_MAX 100000
+#define NUM_THREADS 100
 #define PARCELA 1000
 
 int a[TAM_MAX];
