@@ -5,7 +5,8 @@
 #define TRUE 1
 
 #define REAL_TIME 0
-#define ROUND_ROBIN 1
+#define PRIORIDADE 1
+#define ROUND_ROBIN 2
 
 #define SHM_KEY 1000
 #define SHM_KEY2 7000
@@ -16,6 +17,7 @@ typedef struct process
 {
     char name[8]; // Nome do Programa
     int index;     // Numero do processo
+	int priority;  // Prioridade do processo
     int init;      // Inicio (tempo)
     int duration;  // tempo de duracao
     int policy;    // 0 = REAL_TIME | 1 = PRIORIDADE | 2 = ROUND_ROBIN

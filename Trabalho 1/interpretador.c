@@ -35,7 +35,7 @@ int main(void)
 
 	Process lstProcess[MAX_PROCESSOS];
 
-	size_t segmento =shmget (IPC_PRIVATE, sizeof (CurrentProcess), IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR);
+	size_t segmento = shmget(SHM_KEY, sizeof(CurrentProcess), IPC_CREAT | 0666);
 	if (segmento == -1)
 	{
 		perror("Erro ao alocar memória compartilhada");
@@ -69,6 +69,20 @@ int main(void)
 				inicio = -1;
 				duracao = 1;
 			}
+			else if (policy == 'P'){ /* PRIORIDADE */
+				strcpy(process->p.name, processName);
+				process->p.index = i;
+				process->p.priority = inicio;
+				process->p.init = -1;
+				process->p.duration = 1;
+				process->p.policy = PRIORIDADE;
+				process->p.started = FALSE;
+				process->escalonado = FALSE;
+
+				lstProcess[i] = process->p;
+				i++;
+			}
+
 			else{  /* ROUND ROBIN */
 				strcpy(process->p.name, processName);
 				process->p.index = i;
