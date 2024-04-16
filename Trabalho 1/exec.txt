@@ -1,0 +1,9 @@
+Run <P1> I=<10> D=<5>
+Run <P2> I=<10> D=<5>
+Run <P3> P=<3>
+Run <P4> I=<20> D=<5>
+Run <P5> P=<0>
+Run <P6> I=<40> D=<10>
+Run <P7> I=<50> D=<5>
+Run <P8> P=<5>
+Run <P9> I=<9> D=<5>
