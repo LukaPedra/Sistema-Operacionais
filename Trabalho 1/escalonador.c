@@ -236,13 +236,13 @@ void execProcess(Process p, pid_t* pid){
 
     path = concatenarStrings(inicioPath, p.name);
     
-    char *argv[] = {path, NULL};
+    char *argv[] = {NULL};
     
     *pid = fork();
     if(*pid == 0){
         printf("Iniciando o programa %s\n", path);
         execvp(path, argv);
-        perror("execvp failed");  // execvp() only returns if an error occurred
+        //perror("execvp failed"); // PROBLEMA ESTÁ AQUI // execvp() only returns if an error occurred
         exit(1);
     } 
     return;
