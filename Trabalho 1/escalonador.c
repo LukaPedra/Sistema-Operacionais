@@ -55,7 +55,8 @@ int main(void){
 
 	gettimeofday(&init, NULL);
 	while (!termina){
-
+		//printa a fila rr
+		
 		gettimeofday(&end, NULL);
 		sec = ((end.tv_sec - init.tv_sec) % 60);
 		printf("\n%.1f'\n", sec);
@@ -82,6 +83,8 @@ int main(void){
 		// printf("executando = %s\n", (executing == 0 ? "Não" : "Sim"));
 		/*Inicia a execução dos processos*/ 
 		if (executing == FALSE){
+			printf("Processo = %s -- PID = %d -- Entrou RT\n", p.name, p.pid);
+
 			/* Execução do REAL TIME */
 			if ((!isEmpty(&filaRT)) &&  (sec == filaRT.front->process.init)) {  // Primeiro da fila entra em execução
 				secIni = sec;
@@ -97,6 +100,21 @@ int main(void){
 				}
 
 				executing = TRUE;
+			} 
+			else if (!isEmpty(&filaPR)){
+				p = filaPR.front->process;
+				if (!p.started){
+					execProcess(p, &p.pid);  		// Executa processo pela primeira vez
+					sleep(0.2);				// deixa o programa parado pelo tempo do processo
+					p.pid = *pid;     		// pega o PID do processo
+					p.started = TRUE;		// diz que o processo começou
+				}
+				else{
+					kill(p.pid, SIGCONT);	// Continua o processo já executado uma vez
+					// sleep(p.duration);		// deixa o programa parado pelo tempo do processo
+				}	
+
+				executing = TRUE;			
 			}
 
 			/* Execução do ROUND ROBIN */
@@ -135,6 +153,14 @@ int main(void){
 					// displayQueue(&filaRT); //Imprime Fila de processos Real Time
 					executing = FALSE;
 				}
+			}
+			else if (p.policy == PRIORIDADE){
+				kill(p.pid, SIGSTOP);
+				dequeue(&filaPR);
+				enqueue(&filaPR, p);
+				// printf("\n\nFila Prioridade:\n");
+				// displayQueue(&filaPR); //Imprime Fila de processos Prioridade
+				executing = FALSE;
 			}
 			/* Espera do ROUND ROBIN */
 			else{
@@ -184,9 +210,6 @@ void handler(int sig) {
 	termina = TRUE;
 }
 
-/*void handler1(int sig) {
-	io_bound = TRUE;
-}*/
 
 char* concatenarStrings(const char* str1, const char* str2) {
 	size_t tamanhoStr1 = strlen(str1);
@@ -207,18 +230,20 @@ char* concatenarStrings(const char* str1, const char* str2) {
 }
 
 void execProcess(Process p, pid_t* pid){
-	char inicioPath[] = "./programas/";
-	char *path;
+    char inicioPath[] = "./Processos/";
+    char *path;
+    printf("p.name = %s\n", p.name);
 
-	path = concatenarStrings(inicioPath, p.name);
-	
-	char *argv[] = {NULL};
-	
-	if(fork() == 0){
-		pid = getpid();
-		printf("pid no escalonador = %d\n", pid);
-		printf("Iniciando o programa %s\n", path);
-		execvp(path, argv);
-	} 
-	return;
+    path = concatenarStrings(inicioPath, p.name);
+    
+    char *argv[] = {path, NULL};
+    
+    *pid = fork();
+    if(*pid == 0){
+        printf("Iniciando o programa %s\n", path);
+        execvp(path, argv);
+        perror("execvp failed");  // execvp() only returns if an error occurred
+        exit(1);
+    } 
+    return;
 }

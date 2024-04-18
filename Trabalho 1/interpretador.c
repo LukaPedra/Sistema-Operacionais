@@ -10,7 +10,6 @@
 
 #include "info.h"
 
-#define MAX_PROCESSOS 10
 
 
 
@@ -118,7 +117,7 @@ int isValid(Process *lp, int tam, int inicio, int duracao){
 		if (((inicio + duracao) >= lp[i].init) && ((inicio + duracao) <= (lp[i].init + lp[i].duration))){
 			return FALSE;
 		}
-	}
+	} 
 
 	if ((inicio + duracao) > 59){
 		return FALSE;
