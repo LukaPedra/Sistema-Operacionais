@@ -27,6 +27,11 @@ int main(void)
 {
 	int shmid_process, shmid_pid;
 	CurrentProcess *processInfo;
+	// pid_t *pid = malloc(sizeof(pid_t));
+	// if (pid == NULL) {
+	// 	perror("Failed to allocate memory for pid");
+	// 	exit(EXIT_FAILURE);
+	// }
 	pid_t *pid;
 
 	struct timeval init, end;
@@ -34,9 +39,9 @@ int main(void)
 	float secIni;
 
 	// Anexar à memória compartilhada do processo recebido do interpretador
-	// shmid_pid = shmget(SHM_KEY2, sizeof(pid_t), IPC_CREAT | 0666);
-	// if (!shmid_pid){ perror("Erro ao criar a memória compartilhada do shmid_pid.\n"); exit(1);}
-	// pid = shmat(shmid_pid, 0, 0);
+	shmid_pid = shmget(SHM_KEY2, sizeof(pid_t), IPC_CREAT | 0666);
+	if (!shmid_pid){ perror("Erro ao criar a memória compartilhada do shmid_pid.\n"); exit(1);}
+	pid = shmat(shmid_pid, 0, 0);
 
 	// Anexar à memória compartilhada do pid recebido pelo processo executado na fila
 	shmid_process = shmget(SHM_KEY, sizeof(CurrentProcess), IPC_CREAT | 0666);
@@ -132,19 +137,17 @@ int main(void)
 				/* Execução do ROUND ROBIN */
 				else if (!isEmpty(&filaRR))
 				{
+					printf("Entrou no Round Robin\n");
+					printf("Processo começou: %d\n", filaRR.front->process.started);
 					p = filaRR.front->process;
-
-					if (!p.started)
-					{
-						execProcess(p, &p.pid); // Executa processo pela primeira vez
+					if(!p.started){
+						execProcess(p, pid); // Executa processo pela primeira vez
 						p.pid = *pid;			// pega o PID do processo
 						p.started = TRUE;		// diz que o processo começou
 					}
-					else
-					{
+					else{
 						kill(p.pid, SIGCONT); // Continua o processo já executado uma vez
 					}
-
 					executing = TRUE;
 				}
 			}
@@ -189,7 +192,7 @@ int main(void)
 			}
 		sleep(1);
 	}
-
+	free(pid);
 	/* Libera a memória compartilhada */
 	shmctl(shmid_process, IPC_RMID, 0);
 
@@ -241,14 +244,18 @@ void execProcess(Process p, pid_t *pid)
 {
 	char inicioPath[] = "./Processos/";
 	char *path;
+	pid_t aux;
 	printf("p.name = %s\n", p.name);
 
 	path = concatenarStrings(inicioPath, p.name);
 
 	char *argv[] = {path, NULL};
 
-	*pid = fork();
-	if (*pid == 0)
+	aux = fork();
+	if (aux == 0){
+		*pid = getpid();
+	}
+	if (aux == 0)
 	{
 		printf("Iniciando o programa %s\n", path);
 		execvp(path, argv);
