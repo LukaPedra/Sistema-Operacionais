@@ -40,9 +40,10 @@ typedef struct queue
 {
     Node *front;
     Node *rear;
+	int Type;
 } Queue;
 
-void initQueue(Queue *q);
+void initQueue(Queue *q, int Type);
 int isEmpty(Queue *q);
 void enqueue(Queue *q, Process p);
 void dequeue(Queue *q);

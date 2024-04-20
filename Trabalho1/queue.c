@@ -3,105 +3,126 @@
 
 #include "info.h"
 
-void initQueue(Queue *q)
+void initQueue(Queue *q, int Type)
 {
-    q->front = NULL;
-    q->rear = NULL;
+	q->front = NULL;
+	q->rear = NULL;
+	q->Type = Type;
 }
+
 
 int isEmpty(Queue *q)
 {
-    if (q->front == NULL)
-    {
-        return TRUE;
-    }
-    return FALSE;
+	if (q->front == NULL)
+	{
+		return TRUE;
+	}
+	return FALSE;
 }
 
 void enqueue(Queue *q, Process p)
 {
-    Node *newNode = (Node *)malloc(sizeof(Node));
-    newNode->process = p;
-    newNode->next = NULL;
+	Node *newNode = (Node *)malloc(sizeof(Node));
+	newNode->process = p;
+	newNode->next = NULL;
 
-    if (isEmpty(q))
-    {
-        q->front = newNode;
-        q->rear = newNode;
-    }
-    else
-    {
-        q->rear->next = newNode;
-        q->rear = newNode;
-    }
+	if (isEmpty(q))
+	{
+		q->front = newNode;
+		q->rear = newNode;
+	}
+	else
+	{
+		q->rear->next = newNode;
+		q->rear = newNode;
+	}
 }
 
 void dequeue(Queue *q)
 {
-    if (isEmpty(q))
-    {
-        printf("A fila está vazia. Nenhum elemento para remover.\n");
-        return;
-    }
+	if (isEmpty(q))
+	{
+		printf("A fila está vazia. Nenhum elemento para remover.\n");
+		return;
+	}
 
-    Node *temp = q->front;
-    q->front = q->front->next; // Segundo da fila
+	Node *temp = q->front;
+	q->front = q->front->next; // Segundo da fila
 
-    if (q->front == NULL)
-    {                   // Se a fila só tinha um elemento
-        q->rear = NULL; // Fila se torna vazia
-    }
+	if (q->front == NULL)
+	{					// Se a fila só tinha um elemento
+		q->rear = NULL; // Fila se torna vazia
+	}
 
-    free(temp); // Libera o antigo primeiro da fila
+	free(temp); // Libera o antigo primeiro da fila
 }
 
 void displayQueue(Queue *q)
 {
-    if (isEmpty(q))
-    {
-        printf("A fila está vazia.\n");
-        return;
-    }
+	if (isEmpty(q))
+	{
+		printf("A fila está vazia.\n");
+		return;
+	}
 
-    Node *temp = q->front;
-    // printf("*******************\n");
+	Node *temp = q->front;
+	// printf("*******************\n");
 
-    while (temp != NULL)
-    {
-        // printf("%s\nInício: %d' \nDuração: %d' \n", temp->process.name, temp->process.init, temp->process.duration);
-        printf("%s -> ", temp->process.name);
-        temp = temp->next;
-    }
+	while (temp != NULL)
+	{
+		// printf("%s\nInício: %d' \nDuração: %d' \n", temp->process.name, temp->process.init, temp->process.duration);
+		printf("%s -> ", temp->process.name);
+		temp = temp->next;
+	}
 
-    printf("FINAL DA FILA\n*******************\n");
+	printf("FINAL DA FILA\n*******************\n");
 }
 
 void queueSort(Queue *q)
 {
-    if (isEmpty(q) || q->front->next == NULL)
-    {
-        return;
-    }
+	if (isEmpty(q) || q->front->next == NULL)
+	{
+		return;
+	}
 
-    Node *currNode = q->front;
-    int swapped;
-    Process temp;
+	Node *currNode = q->front;
+	int swapped;
+	Process temp;
 
-    do
-    {
-        swapped = 0;
-        currNode = q->front;
-
-        while (currNode->next != NULL)
-        {
-            if (currNode->process.init > currNode->next->process.init)
-            {
-                temp = currNode->process;
-                currNode->process = currNode->next->process;
-                currNode->next->process = temp;
-                swapped = 1;
-            }
-            currNode = currNode->next;
-        }
-    } while (swapped);
+	do
+	{
+		swapped = 0;
+		currNode = q->front;
+		if (q->Type == REAL_TIME)
+		{
+			while (currNode->next != NULL)
+			{
+				if (currNode->process.init > currNode->next->process.init)
+				{
+					temp = currNode->process;
+					currNode->process = currNode->next->process;
+					currNode->next->process = temp;
+					swapped = 1;
+				}
+				currNode = currNode->next;
+			}
+		}
+		// organiza a fila de prioridade por prioridade
+		else if (q->Type == PRIORIDADE)
+		{
+			printf("Organizando por prioridade\n");
+			while (currNode->next != NULL)
+			{
+				if (currNode->process.priority < currNode->next->process.priority)
+				{
+					temp = currNode->process;
+					currNode->process = currNode->next->process;
+					currNode->next->process = temp;
+					swapped = 1;
+				}
+				currNode = currNode->next;
+			}
+		}
+		
+	} while (swapped);
 }

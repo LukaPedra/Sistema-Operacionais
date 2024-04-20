@@ -50,9 +50,9 @@ int main(void)
 	Queue filaRR;
 	Queue filaRT;
 	Queue filaPR;
-	initQueue(&filaRR);
-	initQueue(&filaRT);
-	initQueue(&filaPR);
+	initQueue(&filaRR, ROUND_ROBIN);
+	initQueue(&filaRT, REAL_TIME);
+	initQueue(&filaPR, PRIORIDADE);
 
 	Process p;
 
@@ -70,7 +70,7 @@ int main(void)
 		// Receve o processo do interpretador
 		if (processInfo->escalonado == FALSE)
 		{ /*Se ainda recebe processo entra aqui*/
-			printf("Processo = %s -- PID = %d -- Entrou\n", processInfo->p.name, processInfo->p.pid);
+			printf("Processo = %s -- Prioridadde = %d -- Entrou\n", processInfo->p.name, processInfo->p.priority);
 			Queue *filaAux;
 
 			if (processInfo->p.policy == REAL_TIME)
@@ -88,121 +88,126 @@ int main(void)
 
 			processInfo->escalonado = alocateProcess(filaAux, processInfo->p);
 		}
+		displayQueue(&filaRR);
 
-		// printf("executando = %s\n", (executing == 0 ? "Não" : "Sim"));
-		/*Inicia a execução dos processos*/
-		if (executing == FALSE)
-		{
-			printf("Processo = %s -- PID = %d -- Entrou RT\n", p.name, p.pid);
-
-			/* Execução do REAL TIME */
-			if ((!isEmpty(&filaRT)) && (sec == filaRT.front->process.init))
-			{ // Primeiro da fila entra em execução
-				secIni = sec;
-				p = filaRT.front->process;
-				
-				if (!p.started)
-				{
-					execProcess(p, &p.pid); // Executa processo pela primeira vez
-					p.started = TRUE;		// diz que o processo começou
-				}
-				else
-				{
-					kill(p.pid, SIGCONT); // Continua o processo já executado uma vez
-				}
-
-				executing = TRUE;
-			}
-			else if (!isEmpty(&filaPR))
+			/*Inicia a execução dos processos*/
+			if (executing == FALSE)
 			{
-				p = filaPR.front->process;
-				if (!p.started)
-				{
-					execProcess(p, &p.pid); // Executa processo pela primeira vez
-					p.pid = *pid;			// pega o PID do processo
-					p.started = TRUE;		// diz que o processo começou
+
+				/* Execução do REAL TIME */
+				if ((!isEmpty(&filaRT)) && (sec == filaRT.front->process.init))
+				{ // Primeiro da fila entra em execução
+					secIni = sec;
+					p = filaRT.front->process;
+
+					if (!p.started)
+					{
+						execProcess(p, &p.pid); // Executa processo pela primeira vez
+						p.started = TRUE;		// diz que o processo começou
+					}
+					else
+					{
+						kill(p.pid, SIGCONT); // Continua o processo já executado uma vez
+					}
+
+					executing = TRUE;
 				}
-				else
+				else if (!isEmpty(&filaPR))
 				{
-					kill(p.pid, SIGCONT); // Continua o processo já executado uma vez
+					p = filaPR.front->process;
+					if (!p.started)
+					{
+						execProcess(p, &p.pid); // Executa processo pela primeira vez
+						p.pid = *pid;			// pega o PID do processo
+						p.started = TRUE;		// diz que o processo começou
+					}
+					else
+					{
+						kill(p.pid, SIGCONT); // Continua o processo já executado uma vez
+					}
+
+					executing = TRUE;
 				}
 
-				executing = TRUE;
+				/* Execução do ROUND ROBIN */
+				else if (!isEmpty(&filaRR))
+				{
+					p = filaRR.front->process;
+
+					if (!p.started)
+					{
+						execProcess(p, &p.pid); // Executa processo pela primeira vez
+						p.pid = *pid;			// pega o PID do processo
+						p.started = TRUE;		// diz que o processo começou
+					}
+					else
+					{
+						kill(p.pid, SIGCONT); // Continua o processo já executado uma vez
+					}
+
+					executing = TRUE;
+				}
 			}
 
-			/* Execução do ROUND ROBIN */
-			else if (!isEmpty(&filaRR))
+			if (executing == TRUE)
 			{
-				p = filaRR.front->process;
+				p.pid = *pid;
 
-				if (!p.started)
+				if (p.policy == REAL_TIME)
 				{
-					execProcess(p, &p.pid); // Executa processo pela primeira vez
-					p.pid = *pid;			// pega o PID do processo
-					p.started = TRUE;		// diz que o processo começou
+					if (sec == secIni + p.duration)
+					{
+						kill(p.pid, SIGSTOP);
+
+						dequeue(&filaRT);
+						enqueue(&filaRT, p);
+						// printf("\n\nFila Real Time:\n");
+						// displayQueue(&filaRT); //Imprime Fila de processos Real Time
+						executing = FALSE;
+					}
 				}
-				else
-				{
-					kill(p.pid, SIGCONT); // Continua o processo já executado uma vez
-				}
-
-				executing = TRUE;
-			}
-		}
-
-		if (executing == TRUE)
-		{
-			p.pid = *pid;
-
-			if (p.policy == REAL_TIME)
-			{
-				if (sec == secIni + p.duration)
+				else if (p.policy == PRIORIDADE)
 				{
 					kill(p.pid, SIGSTOP);
+					dequeue(&filaPR);
+					enqueue(&filaPR, p);
+					// printf("\n\nFila Prioridade:\n");
+					// displayQueue(&filaPR); //Imprime Fila de processos Prioridade
+					executing = FALSE;
+				}
+				/* Espera do ROUND ROBIN */
+				else
+				{
+					kill(p.pid, SIGSTOP);
+					dequeue(&filaRR);
 
-					dequeue(&filaRT);
-					enqueue(&filaRT, p);
-					// printf("\n\nFila Real Time:\n");
-					// displayQueue(&filaRT); //Imprime Fila de processos Real Time
+					enqueue(&filaRR, p);
+					// printf("\n\nFila Round Robin:\n");
+					// displayQueue(&filaRR); //Imprime Fila de processos Round Robin
 					executing = FALSE;
 				}
 			}
-			else if (p.policy == PRIORIDADE)
-			{
-				kill(p.pid, SIGSTOP);
-				dequeue(&filaPR);
-				enqueue(&filaPR, p);
-				// printf("\n\nFila Prioridade:\n");
-				// displayQueue(&filaPR); //Imprime Fila de processos Prioridade
-				executing = FALSE;
-			}
-			/* Espera do ROUND ROBIN */
-			else
-			{
-				kill(p.pid, SIGSTOP);
-				dequeue(&filaRR);
-
-				enqueue(&filaRR, p);
-				// printf("\n\nFila Round Robin:\n");
-				// displayQueue(&filaRR); //Imprime Fila de processos Round Robin
-				executing = FALSE;
-			}
-		}
 		sleep(1);
 	}
 
 	/* Libera a memória compartilhada */
 	shmctl(shmid_process, IPC_RMID, 0);
-	shmctl(shmid_pid, IPC_RMID, 0);
 
 	return 0;
 }
 
 int alocateProcess(Queue *q, Process p)
 {
-
+	if (p.policy == PRIORIDADE)
+	{
+		// organizar a fila de prioridade por prioridade
+	}
 	enqueue(q, p);
-	queueSort(q);
+	// após botar na fila ele organiza a fila de acordo com o tipo do processo
+	if (q->Type != ROUND_ROBIN)
+	{
+		queueSort(q);
+	}
 
 	return TRUE;
 }
@@ -232,21 +237,23 @@ char *concatenarStrings(const char *str1, const char *str2)
 	return resultado;
 }
 
-void execProcess(Process p, pid_t* pid){
+void execProcess(Process p, pid_t *pid)
+{
 	char inicioPath[] = "./Processos/";
 	char *path;
 	printf("p.name = %s\n", p.name);
 
 	path = concatenarStrings(inicioPath, p.name);
-	
+
 	char *argv[] = {path, NULL};
-	
+
 	*pid = fork();
-	if(*pid == 0){
+	if (*pid == 0)
+	{
 		printf("Iniciando o programa %s\n", path);
 		execvp(path, argv);
-		perror("execvp failed");  // execvp() only returns if an error occurred
+		perror("execvp failed"); // execvp() only returns if an error occurred
 		exit(1);
-	} 
+	}
 	return;
 }
