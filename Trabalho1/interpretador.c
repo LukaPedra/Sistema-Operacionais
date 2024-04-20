@@ -57,7 +57,8 @@ int main(void)
 					process->escalonado = FALSE;
 
 					lstProcess[i] = process->p;
-					i++;				}
+					i++;
+				}
 				
 				else{
 					printf("Processo: (%s) inválido. Tempo de execução excede o limite permitido.\n", processName);
