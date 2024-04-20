@@ -70,6 +70,7 @@ int main(void)
 		// Receve o processo do interpretador
 		if (processInfo->escalonado == FALSE)
 		{ /*Se ainda recebe processo entra aqui*/
+			printf("Processo = %s -- PID = %d -- Entrou\n", processInfo->p.name, processInfo->p.pid);
 			Queue *filaAux;
 
 			if (processInfo->p.policy == REAL_TIME)

@@ -4,18 +4,18 @@ Lab2/main
 .DS_Store
 *.exe
 *.out
-Trabalho 1/Processos/P1
-Trabalho 1/Processos/P10
-Trabalho 1/Processos/P2
-Trabalho 1/Processos/P3
-Trabalho 1/Processos/P4
-Trabalho 1/Processos/P5
-Trabalho 1/Processos/P6
-Trabalho 1/Processos/P7
-Trabalho 1/Processos/P8
-Trabalho 1/Processos/P9
-Trabalho 1/interpretador
-Trabalho 1/escalonador
+Trabalho1/Processos/P1
+Trabalho1/Processos/P10
+Trabalho1/Processos/P2
+Trabalho1/Processos/P3
+Trabalho1/Processos/P4
+Trabalho1/Processos/P5
+Trabalho1/Processos/P6
+Trabalho1/Processos/P7
+Trabalho1/Processos/P8
+Trabalho1/Processos/P9
+Trabalho1/interpretador
+Trabalho1/escalonador
 /.vscode
 /Trabalho1/escalonador.dSYM
 /Trabalho1/interpretador.dSYM
