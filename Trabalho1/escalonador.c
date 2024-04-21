@@ -16,7 +16,7 @@ void handler(int sig);
 // void handler1(int sig);
 int alocateProcess(Queue *q, Process p);
 char *concatenarStrings(const char *str1, const char *str2);
-void execProcess(Process p, pid_t *pid);
+void execProcess(Process *p);
 
 // Globais:
 //  int io_bound = FALSE;
@@ -109,7 +109,7 @@ int main(void)
 					if (!p.started)
 					{
 						printf("pid dentro do struct = %d\n", p.pid);
-						execProcess(p, &p.pid); // Executa processo pela primeira vez
+						execProcess(&p); // Executa processo pela primeira vez
 						printf("pid fora do struct = %d\n", *pid);
 						printf("Processo %s iniciado com PID %d\n", p.name, p.pid);
 						
@@ -128,7 +128,7 @@ int main(void)
 					p = filaPR.front->process;
 					if (!p.started)
 					{
-						execProcess(p, &p.pid); // Executa processo pela primeira vez
+						execProcess(&p); // Executa processo pela primeira vez
 						// p.pid = *pid;			// pega o PID do processo
 						p.started = TRUE;		// diz que o processo começou
 					}
@@ -144,12 +144,12 @@ int main(void)
 				else if (!isEmpty(&filaRR))
 				{
 					printf("Entrou no Round Robin\n");
-					printf("Processo começou: %d\n", filaRR.front->process.started);
 					p = filaRR.front->process;
 					if(!p.started){
-						execProcess(p, pid); // Executa processo pela primeira vez
+						execProcess(&p); // Executa processo pela primeira vez
 						// p.pid = *pid;			// pega o PID do processo
 						p.started = TRUE;		// diz que o processo começou
+						printf("Processo %s iniciado com PID %d\n", p.name, p.pid);
 					}
 					else{
 						kill(p.pid, SIGCONT); // Continua o processo já executado uma vez
@@ -247,43 +247,31 @@ char *concatenarStrings(const char *str1, const char *str2)
 	return resultado;
 }
 
-void execProcess(Process p, pid_t *pid)
+void execProcess(Process *p)
 {
-	char inicioPath[] = "./Processos/";
-	char *path;
-	pid_t aux;
-	printf("%s rodando\n", p.name);
+    char inicioPath[] = "./Processos/";
+    char *path;
+    pid_t aux;
+    printf("%s rodando\n", p->name);
 
-	path = concatenarStrings(inicioPath, p.name);
+    path = concatenarStrings(inicioPath, p->name);
 
-	char *argv[] = {path, NULL};
+    char *argv[] = {path, NULL};
 
-	// aux = fork();
-	// if (aux == 0){
-	// 	*pid = getpid();
-	// }
-	// if (aux == 0)
-	// {
-	// 	printf("Iniciando o programa %s\n", path);
-	// 	execvp(path, argv);
-	// 	perror("execvp failed"); // execvp() only returns if an error occurred
-	// 	exit(1);
-	// }
-	aux = fork();
-	if (aux == 0){
-		// This is the child process.
-		printf("Iniciando o programa %s\n", path);
-		execvp(path, argv);
-		perror("execvp failed"); // execvp() only returns if an error occurred
-		exit(1);
-	} else if (aux > 0) {
-		// This is the parent process.
-		*pid = aux;
-		p.pid = *pid;
-	} else {
-		// Fork failed.
-		perror("fork failed");
-		exit(EXIT_FAILURE);
-	}
-	return;
+    aux = fork();
+    if (aux == 0) {
+        // This is the child process.
+        printf("Iniciando o programa %s\n", path);
+        execvp(path, argv);
+        perror("execvp failed"); // execvp() only returns if an error occurred
+        exit(1);
+    } else if (aux > 0) {
+        // This is the parent process.
+        p->pid = aux;
+    } else {
+        // Fork failed.
+        perror("fork failed");
+        exit(EXIT_FAILURE);
+    }
+    return;
 }
