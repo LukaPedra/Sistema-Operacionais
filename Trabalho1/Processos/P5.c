@@ -6,6 +6,7 @@
 int main(void){
 	while (1)
 	{
+		printf("P5 rodando\n");
 		sleep(1);
 	}
 	

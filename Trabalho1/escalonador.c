@@ -71,11 +71,10 @@ int main(void)
 		gettimeofday(&end, NULL);
 		sec = ((end.tv_sec - init.tv_sec) % 60);
 		printf("\n%.1f'\n", sec);
-
+		printf("Processo atual: %s\n", processInfo->p.name);
 		// Receve o processo do interpretador
 		if (processInfo->escalonado == FALSE)
 		{ /*Se ainda recebe processo entra aqui*/
-			printf("Processo = %s -- Prioridadde = %d -- Entrou\n", processInfo->p.name, processInfo->p.priority);
 			Queue *filaAux;
 
 			if (processInfo->p.policy == REAL_TIME)
@@ -93,6 +92,8 @@ int main(void)
 
 			processInfo->escalonado = alocateProcess(filaAux, processInfo->p);
 		}
+		displayQueue(&filaRT);
+		displayQueue(&filaPR);
 		displayQueue(&filaRR);
 
 			/*Inicia a execução dos processos*/
@@ -107,7 +108,12 @@ int main(void)
 
 					if (!p.started)
 					{
+						printf("pid dentro do struct = %d\n", p.pid);
 						execProcess(p, &p.pid); // Executa processo pela primeira vez
+						printf("pid fora do struct = %d\n", *pid);
+						printf("Processo %s iniciado com PID %d\n", p.name, p.pid);
+						
+						// p.pid = *pid;			// pega o PID do processo
 						p.started = TRUE;		// diz que o processo começou
 					}
 					else
@@ -123,7 +129,7 @@ int main(void)
 					if (!p.started)
 					{
 						execProcess(p, &p.pid); // Executa processo pela primeira vez
-						p.pid = *pid;			// pega o PID do processo
+						// p.pid = *pid;			// pega o PID do processo
 						p.started = TRUE;		// diz que o processo começou
 					}
 					else
@@ -142,7 +148,7 @@ int main(void)
 					p = filaRR.front->process;
 					if(!p.started){
 						execProcess(p, pid); // Executa processo pela primeira vez
-						p.pid = *pid;			// pega o PID do processo
+						// p.pid = *pid;			// pega o PID do processo
 						p.started = TRUE;		// diz que o processo começou
 					}
 					else{
@@ -151,15 +157,15 @@ int main(void)
 					executing = TRUE;
 				}
 			}
-
 			if (executing == TRUE)
 			{
-				p.pid = *pid;
+				// p.pid = *pid;
 
 				if (p.policy == REAL_TIME)
 				{
 					if (sec == secIni + p.duration)
 					{
+						printf("Processo %s terminou\n", p.name);
 						kill(p.pid, SIGSTOP);
 
 						dequeue(&filaRT);
@@ -195,6 +201,7 @@ int main(void)
 	free(pid);
 	/* Libera a memória compartilhada */
 	shmctl(shmid_process, IPC_RMID, 0);
+	shmctl(shmid_pid, IPC_RMID, 0);
 
 	return 0;
 }
@@ -245,22 +252,38 @@ void execProcess(Process p, pid_t *pid)
 	char inicioPath[] = "./Processos/";
 	char *path;
 	pid_t aux;
-	printf("p.name = %s\n", p.name);
+	printf("%s rodando\n", p.name);
 
 	path = concatenarStrings(inicioPath, p.name);
 
 	char *argv[] = {path, NULL};
 
+	// aux = fork();
+	// if (aux == 0){
+	// 	*pid = getpid();
+	// }
+	// if (aux == 0)
+	// {
+	// 	printf("Iniciando o programa %s\n", path);
+	// 	execvp(path, argv);
+	// 	perror("execvp failed"); // execvp() only returns if an error occurred
+	// 	exit(1);
+	// }
 	aux = fork();
 	if (aux == 0){
-		*pid = getpid();
-	}
-	if (aux == 0)
-	{
+		// This is the child process.
 		printf("Iniciando o programa %s\n", path);
 		execvp(path, argv);
 		perror("execvp failed"); // execvp() only returns if an error occurred
 		exit(1);
+	} else if (aux > 0) {
+		// This is the parent process.
+		*pid = aux;
+		p.pid = *pid;
+	} else {
+		// Fork failed.
+		perror("fork failed");
+		exit(EXIT_FAILURE);
 	}
 	return;
 }

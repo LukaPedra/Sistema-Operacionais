@@ -67,7 +67,19 @@ void displayQueue(Queue *q)
 
 	Node *temp = q->front;
 	// printf("*******************\n");
-
+	if (q->Type == REAL_TIME)
+	{
+		printf("Real Time -> ");
+	}
+	else if (q->Type == PRIORIDADE)
+	{
+		printf("Prioridade -> ");
+	}
+	else
+	{
+		printf("Round Robin -> ");
+	}
+	
 	while (temp != NULL)
 	{
 		// printf("%s\nInício: %d' \nDuração: %d' \n", temp->process.name, temp->process.init, temp->process.duration);
@@ -110,7 +122,6 @@ void queueSort(Queue *q)
 		// organiza a fila de prioridade por prioridade
 		else if (q->Type == PRIORIDADE)
 		{
-			printf("Organizando por prioridade\n");
 			while (currNode->next != NULL)
 			{
 				if (currNode->process.priority < currNode->next->process.priority)
