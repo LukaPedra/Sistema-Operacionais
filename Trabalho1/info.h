@@ -7,6 +7,7 @@
 #define REAL_TIME 0
 #define PRIORIDADE 1
 #define ROUND_ROBIN 2
+#define PRONTOS 3
 
 #define SHM_KEY 1000
 #define SHM_KEY2 7000

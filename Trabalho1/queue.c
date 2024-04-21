@@ -75,9 +75,13 @@ void displayQueue(Queue *q)
 	{
 		printf("Prioridade -> ");
 	}
-	else
+	else if (q->Type == ROUND_ROBIN)
 	{
 		printf("Round Robin -> ");
+	}
+	else if (q->Type == PRONTOS)
+	{
+		printf("Prontos -> ");
 	}
 	
 	while (temp != NULL)
@@ -124,7 +128,7 @@ void queueSort(Queue *q)
 		{
 			while (currNode->next != NULL)
 			{
-				if (currNode->process.priority < currNode->next->process.priority)
+				if (currNode->process.priority > currNode->next->process.priority)
 				{
 					temp = currNode->process;
 					currNode->process = currNode->next->process;
