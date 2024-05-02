@@ -73,6 +73,7 @@ int main(void)
 		gettimeofday(&end, NULL);
 		sec = ((end.tv_sec - init.tv_sec) % 60);
 		printf("\n%.1f'\n", sec);
+		displayQueue(&filaPR);
 		printf("Processo atual: %s\n", processInfo->p.name);
 		// Receve o processo do interpretador
 		if (processInfo->escalonado == FALSE)
@@ -93,15 +94,19 @@ int main(void)
 			}
 
 			processInfo->escalonado = alocateProcess(filaAux, processInfo->p);
+			if (processInfo->escalonado == TRUE)
+			{
+				printf("Processo %s escalonado\n", processInfo->p.name);
+			}
 		}
-		displayQueue(&filaRT);
-		// displayQueue(&filaPR);
+		//displayQueue(&filaRT);
+		//displayQueue(&filaPR);
 		// displayQueue(&filaRR);
 		displayQueue(&filaProntos);
+
+		//Tratamento de processos em execução
 		if (executing == TRUE)
 		{
-			// p.pid = *pid;
-
 			if (p.policy == REAL_TIME)
 			{
 				if (sec == secIni + p.duration)
@@ -116,16 +121,16 @@ int main(void)
 					executing = FALSE;
 				}
 			}
-			else if (p.policy == PRIORIDADE)
+			else if ((p.policy == PRIORIDADE)&&(sec == p.init + 5.0))
 			{
 				kill(p.pid, SIGSTOP);
 				dequeue(&filaPR);
+				displayQueue(&filaPR);
 				enqueue(&filaProntos, p);
-				displayQueue(&filaPR); //Imprime Fila de processos Prioridade
 				executing = FALSE;
 			}
 			/* Espera do ROUND ROBIN */
-			else
+			else if (p.policy == ROUND_ROBIN)
 			{
 				kill(p.pid, SIGSTOP);
 				dequeue(&filaRR);
@@ -152,7 +157,6 @@ int main(void)
 				{
 					execProcess(&p); // Executa processo pela primeira vez
 					
-					// p.pid = *pid;			// pega o PID do processo
 					p.started = TRUE;		// diz que o processo começou
 				}
 				else
@@ -163,19 +167,20 @@ int main(void)
 
 				executing = TRUE;
 			}
+			//Execução do PRIORIDADE
 			else if (!isEmpty(&filaPR))
 			{
 				p = filaPR.front->process;
 				if (!p.started)
 				{
-					execProcess(&p); // Executa processo pela primeira vez
-					// p.pid = *pid;			// pega o PID do processo
-					p.started = TRUE;		// diz que o processo começou
+					execProcess(&p);	// Executa processo pela primeira vez
+					p.started = TRUE;	// diz que o processo começou
+					p.init = sec;
+
 				}
 				else
 				{
 					printf("Continuando o processo %s %d\n", p.name,p.pid);
-
 					kill(p.pid, SIGCONT); // Continua o processo já executado uma vez
 				}
 
@@ -221,7 +226,6 @@ int alocateProcess(Queue *q, Process p)
 	{
 		queueSort(q); //Prioridade e Real Time precisam ser organizado as filas
 	}
-
 	return TRUE;
 }
 
