@@ -46,7 +46,7 @@ int main(void)
 
 	// Anexar à memória compartilhada do pid recebido pelo processo executado na fila
 	shmid_process = shmget(SHM_KEY, sizeof(CurrentProcess), IPC_CREAT | 0666);
-	if (!shmid_process)
+	if (shmid_process == -1)
 	{
 		perror("Erro ao criar a memória compartilhada do shmid_process.\n");
 		exit(1);
