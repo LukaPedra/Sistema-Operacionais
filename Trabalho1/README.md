@@ -1,8 +1,11 @@
 # Relatório - Trabalho 1
 
-**Nome: Lucca Vieira Rocha | Matrícula: 2011342
-Nome: Thalita Rangel Bullos | Matrícula: 2020273**
+Nome: Lucca Vieira Rocha | Matrícula: 2011342
+
+Nome: Thalita Rangel Bullos | Matrícula: 2020273
+
 Nota fina: 10/10
+
 ---
 
 # Programas
