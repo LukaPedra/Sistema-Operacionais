@@ -128,7 +128,7 @@ int main(void)
 			{
 				kill(p.pid, SIGSTOP);
 				dequeue(&filaRR);
-
+				enqueue(&filaRR,p);
 				enqueue(&filaProntos, p);
 				
 				executing = FALSE;
