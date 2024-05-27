@@ -1,5 +1,3 @@
-
-
 #include <fcntl.h>
 #include <semaphore.h>
 #include <stdio.h>
@@ -68,13 +66,12 @@ int main(int argc, char *argv[]) {
         printf("Erro ao criar Processo 2 para leitura de mensagens.\n");
         exit(-1);
     }
+
     for (int i = 0; i < 2; i++) {
         wait(&status);
     }
-    // Processo pai espera os processos filhos terminarem
-    // waitpid(pidProcesso1, NULL, 0);
-    // waitpid(pidProcesso2, NULL, 0);
 
+    /* Fechar semáforo e liberar memória compartilhada s*/
     shmdt(mensagem);
     sem_close(semafaro);
     shmctl(segmento, IPC_RMID, NULL);
