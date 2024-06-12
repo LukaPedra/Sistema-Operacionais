@@ -17,31 +17,38 @@
 int main(int argc, char *argv[])
 {
 	key_t key;
-	int msgid;
-	pid_t pidProcesso1;
+	int msgid, status;
+	pid_t pidProcesso1, pidProcesso2;
 
 	key = ftok("key", 65);
 	msgid = msgget(key, 0666 | IPC_CREAT);
-	// Alocar memória compartilhada
-	// segmento = shmget(IPC_PRIVATE, sizeof(int), IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR);
 
 	/* Processo 1 - Envio de mensagens */
 	pidProcesso1 = fork();
-	if (pidProcesso1 == -1)
-	{
-		printf("\nErro ao criar Processo 1.\n");
-		exit(1);
-	}
 	if (pidProcesso1 == 0)
 	{
 		// Enviar mensagem
 		process1_sync(msgid);
-	}
-	else
-	{
+
+	} else if (pidProcesso1 < 0) {
+        perror("\nErro ao criar Processo 1.\n");
+        exit(-1);
+    }
+
+	/* Processo 2 - Leitura de mensagens */
+	pidProcesso2 = fork();
+	if (pidProcesso2 == 0) {
 		// Enviar mensagem
 		process2_sync(msgid);
+	} else if (pidProcesso2 < 0) {
+		perror("\nErro ao criar Processo 2.\n");
+		exit(-1);
 	}
+
+	/* Espera dos processos filhos */
+	for (int i = 0; i < 2; i++) {
+        wait(&status);
+    }
 
 	return 0;
 }
