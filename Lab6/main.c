@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 	int msgid, status;
 	pid_t pidProcesso1, pidProcesso2;
 
-	key = ftok("key", 65);
+	key = ftok("key", 7);
 	msgid = msgget(key, 0666 | IPC_CREAT);
 
 	/* Processo 1 - Envio de mensagens */
@@ -36,19 +36,16 @@ int main(int argc, char *argv[])
     }
 
 	/* Processo 2 - Leitura de mensagens */
-	pidProcesso2 = fork();
-	if (pidProcesso2 == 0) {
+	else {
 		// Enviar mensagem
 		process2_sync(msgid);
-	} else if (pidProcesso2 < 0) {
-		perror("\nErro ao criar Processo 2.\n");
-		exit(-1);
-	}
+	} 
 
 	/* Espera dos processos filhos */
-	for (int i = 0; i < 2; i++) {
-        wait(&status);
-    }
+	wait(&status);
+	
+	// Remover a fila de mensagens
+    msgctl(msgid, IPC_RMID, NULL) ;
 
 	return 0;
 }

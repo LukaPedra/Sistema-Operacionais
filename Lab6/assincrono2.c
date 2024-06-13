@@ -1,8 +1,8 @@
-#include <message.h>
+#include "message.h"
 
 void process2_async(int msgid) {
     struct message msg;
-    for (int i = 1; i <= 128; i++) {
+    for (int i = 1; i <= QTD_MEN; i++) {
         if (msgrcv(msgid, &msg, sizeof(msg.msg_data), 1, 0) == -1) {
             perror("msgrcv");
             exit(1);
