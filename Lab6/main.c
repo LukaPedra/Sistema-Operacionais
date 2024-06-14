@@ -11,26 +11,23 @@
 #include <sys/msg.h>
 #include "message.h"
 
-#define QTD_MEN 128
-#define TAM_BUFFER 8
-
 int main(int argc, char *argv[])
 {
 	key_t key;
 	int msgid, status;
-	pid_t pidProcesso1, pidProcesso2;
+	pid_t pid;
 
 	key = ftok("key", 7);
 	msgid = msgget(key, 0666 | IPC_CREAT);
 
 	/* Processo 1 - Envio de mensagens */
-	pidProcesso1 = fork();
-	if (pidProcesso1 == 0)
+	pid = fork();
+	if (pid == 0)
 	{
 		// Enviar mensagem
-		process1_sync(msgid);
+		processo1_sinc(msgid);
 
-	} else if (pidProcesso1 < 0) {
+	} else if (pid < 0) {
         perror("\nErro ao criar Processo 1.\n");
         exit(-1);
     }
@@ -38,7 +35,7 @@ int main(int argc, char *argv[])
 	/* Processo 2 - Leitura de mensagens */
 	else {
 		// Enviar mensagem
-		process2_sync(msgid);
+		processo2_sinc(msgid);
 	} 
 
 	/* Espera dos processos filhos */

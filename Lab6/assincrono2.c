@@ -1,6 +1,6 @@
 #include "message.h"
 
-void process2_async(int msgid) {
+void processo2_asssinc(int msgid) {
     struct message msg;
     for (int i = 1; i <= QTD_MEN; i++) {
         if (msgrcv(msgid, &msg, sizeof(msg.msg_data), 1, 0) == -1) {

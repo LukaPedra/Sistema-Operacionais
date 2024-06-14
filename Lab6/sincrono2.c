@@ -1,6 +1,6 @@
 #include "message.h"
 
-void process2_sync(int msgid)
+void processo2_sinc(int msgid)
 {
 	struct message msg;
 	for (int i = 1; i <= QTD_MEN; i++)

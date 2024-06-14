@@ -20,10 +20,9 @@ struct message {
     int msg_data;
 };
 
-void process1_sync(int msgid);
-void process2_sync(int msgid);
-void process1_async(int msgid);
-void process2_async(int msgid);
-
+void processo1_sinc(int msgid);
+void processo2_sinc(int msgid);
+void processo1_asssinc(int msgid);
+void processo2_asssinc(int msgid);
 
 #endif

@@ -25,24 +25,20 @@ int main() {
 
     if (pid == 0) {
         // Processo filho (Processo 2)
-        process2_async(msgid);
+        processo2_asssinc(msgid);
     } else {
         // Processo pai (Processo 1)
-        process1_async(msgid);
+        processo1_asssinc(msgid);
 
 		// Aguardar o processo filho terminar
 		waitpid(pid, &status, 0);
-		printf("JABBAAAAA\n");
 
 		// Remover a fila de mensagens
 		if (msgctl(msgid, IPC_RMID, NULL) == -1) {
 			perror("msgctl");
 			exit(1);
 		}
-
     }
-
-    
 
     return 0;
 }
