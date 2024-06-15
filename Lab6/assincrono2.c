@@ -8,6 +8,12 @@ void processo2_asssinc(int msgid) {
             exit(1);
         }
         printf("Processo 2: Mensagem %d recebida\n", msg.msg_data);
-        sleep(1);
+
+        msg.msg_type = 2;
+        if (msgsnd(msgid, &msg, sizeof(msg.msg_data), 0) == -1) {
+            perror("msgsnd");
+            exit(1);
+        }
+        printf("Processo 2: Resposta %d enviada\n", msg.msg_data);
     }
 }

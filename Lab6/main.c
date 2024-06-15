@@ -36,13 +36,14 @@ int main(int argc, char *argv[])
 	else {
 		// Enviar mensagem
 		processo2_sinc(msgid);
+		// Espera dos processos filhos
+		wait(&status);
+		
+		// Remover a fila de mensagens
+		msgctl(msgid, IPC_RMID, NULL) ;
 	} 
 
-	/* Espera dos processos filhos */
-	wait(&status);
 	
-	// Remover a fila de mensagens
-    msgctl(msgid, IPC_RMID, NULL) ;
 
 	return 0;
 }

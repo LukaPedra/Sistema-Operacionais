@@ -10,5 +10,11 @@ void processo1_asssinc(int msgid) {
             exit(1);
         }
         printf("Processo 1: Mensagem %d enviada\n", i);
+
+        if(msgrcv(msgid, &msg, sizeof(msg.msg_data), 2, 0) == -1) {
+            perror("msgrcv");
+            exit(1);
+        }
+        printf("Processo 1: Resposta %d recebida\n", msg.msg_data);
     }
 }
