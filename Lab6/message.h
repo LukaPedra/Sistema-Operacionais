@@ -1,6 +1,3 @@
-#ifndef MESSAGE_H
-#define MESSAGE_H
-
 #include <fcntl.h>
 #include <semaphore.h>
 #include <stdio.h>
@@ -13,7 +10,7 @@
 #include <sys/wait.h>
 #include <sys/msg.h>
 
-#define QTD_MEN 8
+#define QTD_MEN 128
 #define TAM_BUFFER 8
 struct message {
     long msg_type;
@@ -24,5 +21,3 @@ void processo1_sinc(int msgid);
 void processo2_sinc(int msgid);
 void processo1_asssinc(int msgid);
 void processo2_asssinc(int msgid);
-
-#endif

@@ -10,10 +10,5 @@ void processo1_asssinc(int msgid) {
             exit(1);
         }
         printf("Processo 1: Mensagem %d enviada\n", i);
-
-        // Se o buffer estiver cheio, aguarde até que haja espaço
-        if ((i % 8) == 0) {
-            sleep(1); // simular espera
-        }
     }
 }

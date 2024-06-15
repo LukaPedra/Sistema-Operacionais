@@ -1,10 +1,18 @@
 #include "message.h"
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
 
 int main() {
     key_t key;
     int msgid;
     pid_t pid;
 	int status;
+    struct msqid_ds msgQueue;
+    struct msqid_ds msq;
+
+    msq.msg_perm.mode = 0666;
+    msq.msg_qbytes = 32; // Definir número máximo de bytes na fila de mensagens
 
     // Gerar uma chave única
     key = ftok("progfile", 65);
@@ -13,6 +21,12 @@ int main() {
     msgid = msgget(key, 0666 | IPC_CREAT);
     if (msgid == -1) {
         perror("msgget");
+        exit(1);
+    }
+
+    // Obter as informações da fila de mensagens
+    if (msgctl(msgid, IPC_SET, &msq) == -1) {
+        perror("msgctl");
         exit(1);
     }
 
