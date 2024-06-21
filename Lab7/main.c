@@ -4,6 +4,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
+#include <dirent.h>
+#include <string.h>
 #include "aux.h"
 
 int main(int argc, char *argv[]) {
@@ -33,7 +35,8 @@ int main(int argc, char *argv[]) {
         perror("chmod");
     }
 
-    /* Item 6: */
+    /* Item 6: Imprimir recursivamente os sub-diretórios de um diretório */
+    listDirectories("so", 0);
 	
     return 0;
 }

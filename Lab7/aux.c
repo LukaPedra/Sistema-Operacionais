@@ -4,6 +4,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
+#include <dirent.h>
+#include <string.h>
 
 // Função para exibir o conteúdo de um arquivo
 void printFile(char *file) {
@@ -98,11 +100,13 @@ void modifyFileContent(const char *filepath, const char *conteudo, int offset) {
 
     fclose(filePointer);
 }
-void list_directories_recursively(const char *base_path, int indent) {
+
+// Função para listar recursivamente os sub-diretórios de um diretório
+void listDirectories(const char *dirpath, int indent) {
     DIR *dir;
     struct dirent *entry;
 
-    if (!(dir = opendir(base_path)))
+    if (!(dir = opendir(dirpath)))
         return;
 
     while ((entry = readdir(dir)) != NULL) {
@@ -110,9 +114,9 @@ void list_directories_recursively(const char *base_path, int indent) {
             char path[1024];
             if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
                 continue;
-            snprintf(path, sizeof(path), "%s/%s", base_path, entry->d_name);
+            snprintf(path, sizeof(path), "%s/%s", dirpath, entry->d_name);
             printf("%*s[%s]\n", indent, "", entry->d_name);
-            list_directories_recursively(path, indent + 2);
+            listDirectories(path, indent + 2);
         }
     }
     closedir(dir);
