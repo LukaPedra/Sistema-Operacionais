@@ -37,10 +37,10 @@ void printFile(char *file) {
 
 // Função para criar diretórios e arquivos
 void createDirectories() {
-    mkdir("so", 0777);
-    mkdir("so/a", 0777);
-    mkdir("so/b", 0777);
-    mkdir("so/c", 0777);
+    mkdir("so", 0700);
+    mkdir("so/a", 0700);
+    mkdir("so/b", 0700);
+    mkdir("so/c", 0700);
     
     FILE *fa = fopen("so/a/arqa.txt", "w");
     FILE *fb = fopen("so/b/arqb.txt", "w");
@@ -62,14 +62,17 @@ void createDirectories() {
     }
 }
 
-void displayFileAttributes
-(const char *filepath) {
-    struct stat st;
+// Função para exibir os atributos de um arquivo
+void displayFileAttributes(const char *filepath) {
+    struct stat st; // Estrutura para armazenar os atributos do arquivo
+
+    // Obter os atributos do arquivo
     if (stat(filepath, &st) != 0) {
         perror("stat");
         return;
     }
 
+    // Exibição dos atributos
     printf("Atributos do arquivo %s:\n", filepath);
     printf("Tamanho: %lld bytes\n", st.st_size);
     printf("Permissões: %o\n", st.st_mode & 0777);
@@ -78,7 +81,7 @@ void displayFileAttributes
     printf("ID do grupo (GID): %d\n", st.st_gid);
     printf("Último acesso: %s", ctime(&st.st_atime));
     printf("Última modificação: %s", ctime(&st.st_mtime));
-    printf("Última alteração: %s", ctime(&st.st_ctime));
+    printf("Última alteração dos atributos: %s", ctime(&st.st_ctime));
 }
 
 void modifyFileContent(const char *filepath, const char *conteudo, int offset) {
@@ -102,7 +105,7 @@ void modifyFileContent(const char *filepath, const char *conteudo, int offset) {
 }
 
 // Função para listar recursivamente os sub-diretórios de um diretório
-void listDirectories(const char *dirpath, int indent) {
+void listDirectories(const char *dirpath) {
     DIR *dir;
     struct dirent *entry;
 
@@ -115,8 +118,8 @@ void listDirectories(const char *dirpath, int indent) {
             if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
                 continue;
             snprintf(path, sizeof(path), "%s/%s", dirpath, entry->d_name);
-            printf("%*s[%s]\n", indent, "", entry->d_name);
-            listDirectories(path, indent + 2);
+            printf("\n[%s]", entry->d_name);
+            listDirectories(path);
         }
     }
     closedir(dir);

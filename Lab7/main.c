@@ -30,8 +30,8 @@ int main(int argc, char *argv[]) {
     // Leitura do arquivo
     printFile(file1);
 
-    /* Item 5: Mudança de premissão de acesso à um arquivo */
-    if (chmod(file1, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH) != 0) {
+    /* Item 5: Mudança de permissão de acesso à um arquivo */
+    if (chmod(file1, S_IRGRP | S_IROTH) != 0) {
         perror("chmod");
     }
 
