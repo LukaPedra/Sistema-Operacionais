@@ -12,4 +12,4 @@ void printFile(char *file);
 void createDirectories();
 void displayFileAttributes(const char *filepath);
 void modifyFileContent(const char *filepath, const char *conteudo, int offset);
-void listDirectories(const char *dirpath, int indent);
+void listDirectories(const char *dirpath);

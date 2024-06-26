@@ -6,7 +6,7 @@
 #include <time.h>
 #include <dirent.h>
 #include <string.h>
-#include "aux.h"
+#include "auxiliar.h"
 
 int main(int argc, char *argv[]) {
     // Arquivos
@@ -31,12 +31,12 @@ int main(int argc, char *argv[]) {
     printFile(file1);
 
     /* Item 5: Mudança de permissão de acesso à um arquivo */
-    if (chmod(file1, S_IRGRP | S_IROTH) != 0) {
+    if (chmod(file1, S_IRGRP) != 0) {
         perror("chmod");
     }
 
     /* Item 6: Imprimir recursivamente os sub-diretórios de um diretório */
-    listDirectories("so", 0);
+    listDirectories("so");
 	
     return 0;
 }
