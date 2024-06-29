@@ -62,7 +62,7 @@ void print_page_tables() {
 }
 
 // Função auxiliar para o algoritmo de substituição NRU (Not Recently Used)
-int nru_replace(int process_id) {
+int subs_NRU(int process_id) {
     int class_0 = -1, class_1 = -1, class_2 = -1, class_3 = -1;
     
     for (int i = 0; i < NUM_PAGES; i++) {
@@ -98,7 +98,7 @@ int nru_replace(int process_id) {
 }
 
 // Função auxiliar para o algoritmo de substituição Segunda Chance
-int second_chance_replace(int process_id) {
+int subs_2ndCh(int process_id) {
     static int last_replaced[NUM_PROCESSES] = {0};
     int start = last_replaced[process_id];
     
@@ -119,7 +119,7 @@ int second_chance_replace(int process_id) {
 }
 
 // Função auxiliar para o algoritmo de substituição LRU (Least Recently Used)
-int lru_replace(int process_id) {
+int subs_LRU(int process_id) {
     int lru_page = -1;
     int oldest_time = current_time;
     
@@ -140,7 +140,7 @@ int lru_replace(int process_id) {
 }
 
 // Função auxiliar para o algoritmo de substituição Working Set
-int working_set_replace(int process_id) {
+int subs_WS(int process_id) {
     int oldest_page = -1;
     int oldest_time = current_time;
     
@@ -270,14 +270,14 @@ int main(int argc, char* argv[]) {
     initialize();
 
     if (strcmp(algorithm, "NRU") == 0) {
-        simulate(num_rounds, nru_replace);
+        simulate(num_rounds, subs_NRU);
     } else if (strcmp(algorithm, "2ndChance") == 0) {
-        simulate(num_rounds, second_chance_replace);
+        simulate(num_rounds, subs_2ndCh);
     } else if (strcmp(algorithm, "LRU") == 0) {
-        simulate(num_rounds, lru_replace);
+        simulate(num_rounds, subs_LRU);
     } else if (strncmp(algorithm, "WS", 2) == 0) {
         int k = atoi(algorithm + 2);
-        simulate(num_rounds, working_set_replace); // Como mandar o k?
+        simulate(num_rounds, subs_WS); // Como mandar o k?
     } else {
         printf("Algoritmo desconhecido: %s\n", algorithm);
         printf("Possíveis algoritmos de subsituição:\n1- NRU\n2- 2ndChance\n3- LRU\n4- WS<k>\n");
