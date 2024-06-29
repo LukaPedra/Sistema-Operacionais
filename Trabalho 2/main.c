@@ -36,7 +36,7 @@ typedef struct {
 Process processes[NUM_PROCESSES];
 Frame frames[NUM_FRAMES];
 int current_time = 0;
-
+int k;
 
 // Função auxiliar para encontrar um quadro livre
 int find_free_frame() {
@@ -140,7 +140,7 @@ int lru_replace(int process_id) {
 }
 
 // Função auxiliar para o algoritmo de substituição Working Set
-int working_set_replace(int process_id, int k) {
+int working_set_replace(int process_id) {
     int oldest_page = -1;
     int oldest_time = current_time;
     
