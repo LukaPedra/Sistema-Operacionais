@@ -101,8 +101,9 @@ int subs_NRU(int process_id) {
 int subs_2ndCh(int process_id) {
     static int last_replaced[NUM_PROCESSES] = {0};
     int start = last_replaced[process_id];
-    
-    while (1) {
+    int checked_pages = 0;
+
+    while (checked_pages < NUM_PAGES) {
         if (processes[process_id].page_table[start].valid) {
             if (processes[process_id].page_table[start].referenced) {
                 processes[process_id].page_table[start].referenced = false;
@@ -115,8 +116,12 @@ int subs_2ndCh(int process_id) {
             }
         }
         start = (start + 1) % NUM_PAGES;
+        checked_pages++;
     }
+    
+    return -1;
 }
+
 
 // Função auxiliar para o algoritmo de substituição LRU (Least Recently Used)
 int subs_LRU(int process_id) {
