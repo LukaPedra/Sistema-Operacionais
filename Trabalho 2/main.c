@@ -225,6 +225,10 @@ void access_memory(int process_id, int page_number, char access_type, int (*repl
         } else {
             // Substituir página
             int frame = replace_func(process_id);
+            frames[frame].process_id = process_id;
+            frames[frame].page_number = page_number;
+            page->frame = frame;
+            page->valid = true;
         }
     }
 
