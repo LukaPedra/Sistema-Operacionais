@@ -37,6 +37,7 @@ Process processes[NUM_PROCESSES];
 Frame frames[NUM_FRAMES];
 int current_time = 0;
 int k;
+int conta = 0;
 
 // Função auxiliar para encontrar um quadro livre
 int find_free_frame() {
@@ -162,7 +163,25 @@ int subs_LRU(int process_id) {
 int subs_WS(int process_id) {
     int oldest_page = -1;
     int oldest_time = current_time;
+    int pages_in_memory = 0;
     
+    // Primeiro, contar quantas páginas estão na memória e encontrar a mais antiga
+    for (int i = 0; i < NUM_PAGES; i++) {
+        if (processes[process_id].page_table[i].valid) {
+            pages_in_memory++;
+            if (processes[process_id].page_table[i].last_used < oldest_time) {
+                oldest_time = processes[process_id].page_table[i].last_used;
+                oldest_page = i;
+            }
+        }
+    }
+    
+    // Se o número de páginas na memória é menor que o limite, não precisamos substituir
+    if (pages_in_memory < k) {
+        return find_free_frame();
+    }
+    
+    // Caso contrário, procuramos uma página para substituir
     for (int i = 0; i < NUM_PAGES; i++) {
         if (processes[process_id].page_table[i].valid) {
             if (current_time - processes[process_id].page_table[i].last_used > k) {
@@ -171,10 +190,6 @@ int subs_WS(int process_id) {
                 processes[process_id].page_table[i].valid = false;
                 processes[process_id].page_table[i].frame = -1;
                 return frame;
-            }
-            if (processes[process_id].page_table[i].last_used < oldest_time) {
-                oldest_time = processes[process_id].page_table[i].last_used;
-                oldest_page = i;
             }
         }
     }
@@ -188,7 +203,8 @@ int subs_WS(int process_id) {
     }
     
     // Não deveria chegar aqui, mas por segurança:
-    return -1;
+    fprintf(stderr, "Erro: Não foi possível encontrar uma página para substituir no processo %d\n", process_id);
+    exit(1);
 }
 
 // Função para inicializar as estruturas
@@ -258,7 +274,45 @@ void access_memory(int process_id, int page_number, char access_type, int (*repl
 
     current_time++;
 }
+void access_memory_WS(int process_id, int page_number, char access_type, int (*replace_func)(int)) {
+    Process* process = &processes[process_id];
+    PageTableEntry* page = &process->page_table[page_number];
 
+    if (!page->valid) {
+        // Page fault
+        process->page_faults++;
+        int frame = replace_func(process_id);
+        
+        if (frame == -1) {
+            // Não há quadros livres, precisamos substituir
+            frame = replace_func(process_id);
+        }
+
+        // Atualizar as estruturas de dados
+        if (frames[frame].process_id != -1) {
+            // Invalidar a página antiga que estava neste quadro
+            processes[frames[frame].process_id].page_table[frames[frame].page_number].valid = false;
+            processes[frames[frame].process_id].page_table[frames[frame].page_number].frame = -1;
+        }
+        
+        frames[frame].process_id = process_id;
+        frames[frame].page_number = page_number;
+        page->frame = frame;
+        page->valid = true;
+    }
+
+    // Atualizar bits de acesso e modificação
+    page->referenced = true;
+    if (access_type == 'W') {
+        page->modified = true;
+    }
+
+    // Atualizar informações para LRU e Aging
+    page->last_used = current_time;
+    page->age = (page->age >> 1) | 0x80000000;  // Shift right e set bit mais significativo
+
+    current_time++;
+}
 // Função principal de simulação
 void simulate(int num_rounds, int (*replace_func)(int)) {
     for (int round = 0; round < num_rounds; round++) {
@@ -272,6 +326,25 @@ void simulate(int num_rounds, int (*replace_func)(int)) {
                 rewind(processes[i].access_file);
                 fscanf(processes[i].access_file, "%d %c", &page_number, &access_type);
                 access_memory(i, page_number, access_type, replace_func);
+            }
+        }
+    }
+
+    // Imprimir tabelas de páginas
+    print_page_tables();
+}
+void simulate_WS(int num_rounds, int (*replace_func)(int)) {
+    for (int round = 0; round < num_rounds; round++) {
+        for (int i = 0; i < NUM_PROCESSES; i++) {
+            int page_number;
+            char access_type;
+            if (fscanf(processes[i].access_file, "%d %c", &page_number, &access_type) == 2) {
+                access_memory_WS(i, page_number, access_type, replace_func);
+            } else {
+                // Reiniciar o arquivo se chegou ao fim
+                rewind(processes[i].access_file);
+                fscanf(processes[i].access_file, "%d %c", &page_number, &access_type);
+                access_memory_WS(i, page_number, access_type, replace_func);
             }
         }
     }
@@ -300,7 +373,7 @@ int main(int argc, char* argv[]) {
         simulate(num_rounds, subs_LRU);
     } else if (strncmp(algorithm, "WS", 2) == 0) {
         k = atoi(algorithm + 2);
-        simulate(num_rounds, subs_WS);
+        simulate_WS(num_rounds, subs_WS);
     } else {
         printf("Algoritmo desconhecido: %s\n", algorithm);
         printf("Possíveis algoritmos de subsituição:\n1- NRU\n2- 2ndChance\n3- LRU\n4- WS<k>\n");
