@@ -119,7 +119,21 @@ int subs_2ndCh(int process_id) {
         checked_pages++;
     }
     
-    return -1;
+    // Se não encontrou nenhuma página não referenciada, escolhe a primeira válida
+    for (int i = 0; i < NUM_PAGES; i++) {
+        if (processes[process_id].page_table[i].valid) {
+            int frame = processes[process_id].page_table[i].frame;
+            processes[process_id].page_table[i].valid = false;
+            processes[process_id].page_table[i].frame = -1;
+            last_replaced[process_id] = (i + 1) % NUM_PAGES;
+            return frame;
+        }
+    }
+    
+    // Se chegou aqui, não há páginas válidas para substituir
+    // Isso não deveria acontecer em uma implementação correta
+    fprintf(stderr, "Erro: Não há páginas válidas para substituir no processo %d\n", process_id);
+    exit(1);
 }
 
 
