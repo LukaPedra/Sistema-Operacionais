@@ -285,8 +285,8 @@ int main(int argc, char* argv[]) {
     } else if (strcmp(algorithm, "LRU") == 0) {
         simulate(num_rounds, subs_LRU);
     } else if (strncmp(algorithm, "WS", 2) == 0) {
-        int k = atoi(algorithm + 2);
-        simulate(num_rounds, subs_WS); // Como mandar o k?
+        k = atoi(algorithm + 2);
+        simulate(num_rounds, subs_WS);
     } else {
         printf("Algoritmo desconhecido: %s\n", algorithm);
         printf("Possíveis algoritmos de subsituição:\n1- NRU\n2- 2ndChance\n3- LRU\n4- WS<k>\n");
