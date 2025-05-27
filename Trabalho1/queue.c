@@ -10,6 +10,7 @@ void initQueue(Queue *q, int Type)
 	q->Type = Type;
 }
 
+
 int isEmpty(Queue *q)
 {
 	if (q->front == NULL)
@@ -48,9 +49,8 @@ void dequeue(Queue *q)
 	Node *temp = q->front;
 	q->front = q->front->next; // Segundo da fila
 
-	// Caso em que a fila só tinha um elemento
 	if (q->front == NULL)
-	{					
+	{					// Se a fila só tinha um elemento
 		q->rear = NULL; // Fila se torna vazia
 	}
 
@@ -66,7 +66,7 @@ void displayQueue(Queue *q)
 	}
 
 	Node *temp = q->front;
-	
+	// printf("*******************\n");
 	if (q->Type == REAL_TIME)
 	{
 		printf("Real Time -> ");
@@ -81,24 +81,17 @@ void displayQueue(Queue *q)
 	}
 	else if (q->Type == PRONTOS)
 	{
-		printf("Processos Prontos: ");
+		printf("Prontos -> ");
 	}
 	
 	while (temp != NULL)
 	{
-		if (q->Type == PRONTOS) {
-			printf("%s ", temp->process.name);	
-		} else {
-			printf("%s -> ", temp->process.name);
-		}
+		// printf("%s\nInício: %d' \nDuração: %d' \n", temp->process.name, temp->process.init, temp->process.duration);
+		printf("%s -> ", temp->process.name);
 		temp = temp->next;
 	}
 
-	if (q->Type == PRONTOS) {
-		printf("\n");
-	} else {
-		printf("FINAL DA FILA\n*******************\n");
-	}
+	printf("FINAL DA FILA\n*******************\n");
 }
 
 void queueSort(Queue *q)
@@ -130,8 +123,7 @@ void queueSort(Queue *q)
 				currNode = currNode->next;
 			}
 		}
-
-		// Organização da fila de prioridade por prioridade
+		// organiza a fila de prioridade por prioridade
 		else if (q->Type == PRIORIDADE)
 		{
 			while (currNode->next != NULL)

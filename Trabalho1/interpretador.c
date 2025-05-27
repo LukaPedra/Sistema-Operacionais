@@ -10,20 +10,21 @@
 
 #include "info.h"
 
-// Protótipos
+
+
+
+//Prototypes
 int isValid(Process *lp, int tam, int inicio, int duracao);
 
 int main(void)
 {
-	// Leitura do arquivo
 	char filename[] = "exec.txt";
-	FILE *fp = fopen(filename, "r");
-
+	FILE *fp = fopen(filename, "r"); // abre o arquivo para leitura
 	if (!fp)
 	{
 		puts("Problem opening file fp");
 		exit(1);
-	}
+	} // Trata problema ao abrir o arquivo
 
 	char processName[10];
 	int i = 0;
@@ -42,13 +43,9 @@ int main(void)
 	CurrentProcess* process = shmat(segmento, 0, 0);
 
 	pid_t pid = fork();
-
-	/* Processo Filho */
-	if (pid == 0){
+	if (pid == 0){ /* Processo Filho */
 		while (fscanf(fp, "%*s <%[^>]> %c=<%d> D=<%d>", processName, &policy, &inicio, &duracao) != EOF){ // lê cada linha do arquivo
-			
-			/* REAL TIME */
-			if(policy == 'I'){
+			if(policy == 'I'){ /* REAL TIME */
 				if (isValid(lstProcess, i, inicio, duracao)){
 
 					strcpy(process->p.name, processName);
@@ -71,9 +68,7 @@ int main(void)
 				inicio = -1;
 				duracao = 1;
 			}
-
-			/* PRIORIDADE */
-			else if (policy == 'P'){
+			else if (policy == 'P'){ /* PRIORIDADE */
 				strcpy(process->p.name, processName);
 				process->p.index = i;
 				process->p.priority = inicio;
@@ -87,8 +82,7 @@ int main(void)
 				i++;
 			}
 
-			/* ROUND ROBIN */
-			else{
+			else{  /* ROUND ROBIN */
 				strcpy(process->p.name, processName);
 				process->p.index = i;
 				process->p.init = -1;
@@ -104,13 +98,13 @@ int main(void)
 		}
 	}
 
-	/* Processo Pai */
-	else if (pid > 0){ 
+	else if (pid > 0){ /* Processo Pai */
 		char *argv[] = {NULL};
-		execvp("./escalonador", argv); // Executa o escalonador
+		// sleep(1);
+		execvp("./escalonador", argv); /* Executa o escalonador */
 	}
 
-	fclose(fp); // Fecha o arquivo
+	fclose(fp); /* Fecha o arquivo */
 	return 0;
 }
 
